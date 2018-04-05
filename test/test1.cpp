@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2011-2013,2018 Alexey V. Medvedev
 
-    This file is part of cppcgen. cppcgen is a C++-11 generator of C code with macroses.
+    This file is part of cppcgen. cppcgen is a generator of C code written in C++-11.
 
     cppcgen is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
