@@ -10,11 +10,14 @@ See files COPYING and COPYING.LESSER for details.
 
 ## What is cppcgen?
 **cppcgen** is a library which makes an attempt to allow for easy structured 
-generation of C or simple C++ subroutines incorporating some repeated code 
-structures or similar complex expressions. The expressions definitions 
-can use macroses, which are predefined at runtime in Expressions Directory. 
-Besides the strightforward macroses expansion, the macroprocessor also
-recognizes and interpretes 3 macro 'functions': `EVAL`, `EACH`, and `SEQ`.
+generation of C or simple C++ subroutines. It might be useful for automated 
+generation of some C code portions which incorporate some repeated code 
+structures or repeated similar complex expressions. 
+
+The expressions definitions can use macroses, which are predefined at 
+runtime in Expressions Directory. Besides the strightforward macroses expansion, 
+the macroprocessor also recognizes and interpretes 
+3 macro 'functions': `EVAL`, `EACH`, and `SEQ`.
 
 `EVAL` expands a specific macro in an expression with a specific value 
 given directly in the input string (not predefined in an Expression
@@ -28,7 +31,7 @@ of integer numbers.
 
 ## Examples
 
-### 1. Simple macro expansion:
+#### 1. Simple macro expansion:
 ```
 auto common = dir::add_class("Common");
 common << macro { "foo", "bar" };
@@ -40,7 +43,7 @@ Output:
 > bar
 ```
 
-### 2. Nested macroses:
+#### 2. Nested macroses:
 ```
 auto common = dir::add_class("Common");
 common << macro { "foo1", "bar1" }
@@ -54,7 +57,7 @@ Output:
 > bar2
 ```
 
-### 3. Simple EVAL usage:
+#### 3. Simple EVAL usage:
 ```
 auto common = dir::add_class("Common");
 common << macro { "foo1", "bar1" }
@@ -67,7 +70,7 @@ Output:
 > bar1
 ```
 
-### 4. Simple EACH usage:
+#### 4. Simple EACH usage:
 ```
 auto common = dir::add_class("Common");
 common << macro { "foo1", "bar1" }
@@ -80,7 +83,7 @@ Output:
 > bar1 + bar2
 ```
 
-### 5. Simple SEQ usage:
+#### 5. Simple SEQ usage:
 ```
 auto common = dir::add_class("Common");
 common << macro { "foo1", "bar1" }
@@ -93,8 +96,7 @@ Output:
 ```
 > bar1 * bar2
 ```
-### 6. Simple generation of C language operators, functions and othe syntax
-elements:
+#### 6. Simple generation of C language operators, functions and other syntax elements:
 ```
 auto common = dir::add_class("Common");
 dir::set_as_default(common);
@@ -121,7 +123,7 @@ Output:
 >     }  
 > }
 ```
-### 7. C language operators generation combined with macro expansion:
+#### 7. C language operators generation combined with macro expansion:
 ```
 auto common = dir::add_class("Common");
     common << macro { "arg1", "a" }
