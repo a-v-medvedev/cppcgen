@@ -46,6 +46,7 @@ struct expression_class {
     const std::string name;
     expression_class(const std::string &_name) : name(_name) { }
     friend expression_class &operator <<(expression_class &cl, std::pair<const std::string, const std::string> macro);
+    friend expression_class &operator <<(expression_class &cl, std::vector<std::pair<const std::string, const std::string> > macroses);
 };
 
 struct expression_directory {

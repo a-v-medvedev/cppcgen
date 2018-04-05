@@ -51,19 +51,51 @@ struct else_clause : public branch {
     }
 };
 
+struct for_clause : public branch {
+    std::string e1, e2, e3;
+    for_clause(std::string _e1, std::string _e2, std::string _e3) : branch(),
+                                                                         e1(_e1),
+                                                                         e2(_e2),
+                                                                         e3(_e3) {}
+    virtual void print_prolog(output &out) const {
+        out << "for (" << basic_expr(e1) << "; ";
+        out << basic_expr(e2) << "; ";
+        out << basic_expr(e3) << ") {" << "\n";
+        out.level_up();
+    }
+    virtual void print_epilog(output &out) const {
+        out.level_down();
+        out << "}" << "\n";
+    }
+};
+
 struct return_clause : public branch {
     return_clause() : branch() {}
     virtual void print_prolog(output &out) const { out << "return "; }
     virtual void print_epilog(output &out) const { out << ";\n"; }
 };
 
-struct assignment_clause : public branch {
-    std::string lval, type;
-    assignment_clause(std::string _lval, std::string _type) : branch(),
+struct assignment_clause : public serial {
+    std::string lval, rval;
+    assignment_clause(std::string _lval, std::string _rval) : serial(),
                                                               lval(_lval),
-                                                              type(_type) {}
-    virtual void print_prolog(output &out) const { out << basic_expr(lval) << " = "; }
-    virtual void print_epilog(output &out) const { out << ";\n"; }
+                                                              rval(_rval) {}
+    virtual void print_self(output &out) const { 
+        out << basic_expr(lval) << " = " << basic_expr(rval) << ";\n";
+    }
+};
+
+struct decl_assignment_clause : public serial {
+    std::string type, lval, rval;
+    decl_assignment_clause(std::string _type, std::string _lval, std::string _rval) :
+                                                              serial(),
+                                                              type(_type),
+                                                              lval(_lval),
+                                                              rval(_rval) {}
+    virtual void print_self(output &out) const {
+        out << basic_expr(type) << " " << basic_expr(lval) << " = "
+            << basic_expr(rval) << ";\n";
+    }
 };
 
 }

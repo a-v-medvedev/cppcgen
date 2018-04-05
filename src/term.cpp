@@ -30,7 +30,7 @@ output &operator<<(output &out, const std::string &s) {
     for (std::string::size_type i = 0; (i = str.find("\n", i)) != std::string::npos;) {
         if (i >= str.length() - 1)
             break;
-        str.replace(i, 2, replace);
+        str.replace(i, 1, replace);
         i += replace.length();
     }
     if (out.newline)

@@ -49,9 +49,13 @@ TEST5_BIN = test/test5
 TEST5 = test/test5.cpp
 TEST5_OBJ = $(subst .cpp,.o,$(TEST5))
 
-TEST_BIN = $(TEST1_BIN) $(TEST2_BIN) $(TEST3_BIN) $(TEST4_BIN) $(TEST5_BIN)
-TEST = $(TEST1) $(TEST2) $(TEST3) $(TEST4) $(TEST5)
-TEST_OBJ = $(TEST1_OBJ) $(TEST2_OBJ) $(TEST3_OBJ) $(TEST4_OBJ) $(TEST5_OBJ)
+TEST6_BIN = test/test6
+TEST6 = test/test6.cpp
+TEST6_OBJ = $(subst .cpp,.o,$(TEST6))
+
+TEST_BIN = $(TEST1_BIN) $(TEST2_BIN) $(TEST3_BIN) $(TEST4_BIN) $(TEST5_BIN) $(TEST6_BIN)
+TEST = $(TEST1) $(TEST2) $(TEST3) $(TEST4) $(TEST5) $(TEST6)
+TEST_OBJ = $(TEST1_OBJ) $(TEST2_OBJ) $(TEST3_OBJ) $(TEST4_OBJ) $(TEST5_OBJ) $(TEST6_OBJ)
 
 .PHONY: all sandbox clean showfiles distclean
 
@@ -75,6 +79,10 @@ $(TEST4_BIN): $(TEST4_OBJ)
 
 $(TEST5_BIN): $(TEST5_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(CPPCGEN_LIB_DIR) -l$(CPPCGEN_SHORT) -Wl,-rpath=.
+	
+$(TEST6_BIN): $(TEST6_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(CPPCGEN_LIB_DIR) -l$(CPPCGEN_SHORT) -Wl,-rpath=.
+
 
 clean:
 	rm -f $(TEST_OBJ) $(TEST_BIN)

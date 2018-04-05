@@ -22,12 +22,6 @@
 
 using namespace cppcgen;
 
-static std::string to_string(int a) {
-    std::stringstream s;
-    s << a;
-    return s.str();
-}
-
 struct integer : public branch {
     int a;
     integer(int _a) : branch(), a(_a) {}

@@ -20,13 +20,6 @@
 #include <iostream>
 #include "cppcgen.h"
 
-
-static std::string to_string(int a) {
-    std::stringstream s;
-    s << a;
-    return s.str();
-}
-
 int main()
 {
     using namespace cppcgen;

@@ -32,4 +32,12 @@ expression_class &operator <<(expression_class &cl, std::pair<const std::string,
     return cl;
 }
 
+expression_class &operator <<(expression_class &cl, std::vector<std::pair<const std::string, const std::string> > macroses) {
+    for (auto it = macroses.begin(); it != macroses.end(); ++it) {
+        auto &macro = *it;
+        expression_directory::add_macro(cl.name, macro.first, macro.second);
+    }
+    return cl;
+}
+
 }

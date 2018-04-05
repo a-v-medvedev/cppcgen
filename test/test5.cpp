@@ -22,26 +22,10 @@
 
 using namespace cppcgen;
 
-static std::string to_string(int a) {
-    std::stringstream s;
-    s << a;
-    return s.str();
-}
-
-void split_string(const std::string &str, const std::string &delim, std::vector<std::string> &result) {
-    std::string::size_type j = 0;
-    for (std::string::size_type i = 0; (i = str.find(delim, i)) != std::string::npos;) {
-        result.push_back(str.substr(j, i - j));
-        i += delim.length();
-        j = i;
-    }
-    if (j < str.length() - 1)
-        result.push_back(str.substr(j, str.length() - j));
-}
-
 void find_permutations(std::string str, std::vector<std::string> &result) {
     std::vector<std::string> parts;
-    split_string(str, ",", parts);
+    if (Helpers::Split(str, ",", parts) == 0)
+        return;
     std::sort(parts.begin(), parts.end());
     do {
         std::string s;
@@ -74,7 +58,8 @@ void recursive_arrangements(std::vector<std::string> &arr, std::string str,
 void find_arrangements(std::string str, std::vector<std::string> &result, int r)
 {
     std::vector<std::string> parts;
-    split_string(str, ",", parts);
+    if (Helpers::Split(str, ",", parts) == 0)
+        return;
     std::vector<std::string> tmp_result;
     std::string tmp;
     for (size_t i = 0; i < parts.size(); i++)
@@ -116,12 +101,12 @@ int main()
 
     {
         for (size_t j = 2; j < 5; j++) {
-            std::vector<std::string> permutations;
-            find_arrangements("int,float,double,std::string", permutations, j);
+            std::vector<std::string> arrangements;
+            find_arrangements("int,float,double,std::string", arrangements, j);
             sum << macro { "N", to_string(j) };
             sum << macro { "args", "$EACH${arg{I} @ I=$SEQ${1..{N}} @,}" };
-            for (size_t i = 0; i < permutations.size(); i++) {
-                sum << macro { "types", permutations[i].c_str() };
+            for (size_t i = 0; i < arrangements.size(); i++) {
+                sum << macro { "types", arrangements[i].c_str() };
                 out << 
                     function_clause("{RETURN_TYPE}", 
                                     "sum", 

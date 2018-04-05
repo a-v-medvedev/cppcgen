@@ -23,19 +23,6 @@
 #include "cppcgen_helpers.h"
 
 namespace cppcgen {
-
-static int FromString(std::string &str)
-{
-    return atoi(str.c_str());
-}
-
-static std::string ToString(int i)
-{
-    std::string r;
-    Format(r, "%d", i);
-    return r;    
-}
-
  
 struct eval_style_token {
     size_t start;
@@ -337,10 +324,10 @@ std::string expression::expand(const std::string str, std::string &classes)
             if (k != 3)
                 throw std::runtime_error("$SEQ$ operator: syntax error");
             std::string subresult;
-            for (int z = FromString(B[0]); z <= FromString(B[2]); z += FromString(A[1])) {
-                if (z != FromString(B[0]))
+            for (int z = from_string(B[0]); z <= from_string(B[2]); z += from_string(A[1])) {
+                if (z != from_string(B[0]))
                     subresult += ",";
-                subresult += ToString(z);
+                subresult += to_string(z);
             }
             //          Subresult = Var + "=" + Subresult;
 
