@@ -44,7 +44,7 @@ output &operator<<(output &out, const std::string &s) {
 const term &operator<<(const term &lhs, const term &rhs) { 
     const term *prev = &lhs; 
     for (const term *next = prev->chained; next; prev = next, next = next->chained); 
-    const_cast<term *>(prev)->chained = &rhs; 
+    const_cast<term *>(prev)->chained = &rhs.clone(); 
     return lhs; 
 }
 

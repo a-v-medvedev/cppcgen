@@ -29,6 +29,9 @@ class serial;
 struct basic_expr {
     std::string str;
     expression *sexpr;
+    basic_expr(const basic_expr &other) : str(other.str) {
+        sexpr = new expression(str.c_str());
+    } 
     basic_expr(std::string _str) : str(_str), sexpr(NULL) { 
         sexpr = new expression(str.c_str());
     }

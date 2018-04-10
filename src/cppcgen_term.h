@@ -25,7 +25,7 @@
 #include "cppcgen_basic_expr.h"
 #include "cppcgen_output.h"
 
-#define CLONE_EMPTY(CLASS)     virtual term &clone() const { return *const_cast<CLASS *>(this); }
+#define CLONE_EMPTY(CLASS)     virtual term &clone() const = 0;
 #define CLONE(CLASS)     virtual term &clone() const { \
                              term *ptr = new CLASS(*this); \
                              expression_directory::saver::save(ptr); \
@@ -49,7 +49,11 @@ struct term {
 struct serial : public term {
     const basic_expr *e;
     serial() : term(), e(NULL) {}
-    explicit serial(const basic_expr &_e) : term(), e(&_e) {}
+    serial(const serial &other) : term(other) { 
+        if (other.e) e = new basic_expr(*other.e);
+        else e = NULL;
+    }
+    explicit serial(const basic_expr &_e) : term() { e = new basic_expr(_e); }
     virtual void print_self(output &out) const {
         if (e) { out << e->translate(); }
     }
@@ -57,7 +61,7 @@ struct serial : public term {
         print_self(out);
         if (chained) chained->print(out); 
     }
-    virtual ~serial() {}
+    virtual ~serial() { if (e) delete e; }
     CLONE(serial)
 };
 

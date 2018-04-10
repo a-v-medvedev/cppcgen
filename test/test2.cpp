@@ -27,7 +27,15 @@ struct integer : public branch {
     integer(int _a) : branch(), a(_a) {}
     virtual void print_prolog(output &out) const { out << "{ " << to_string(a) << " "; }
     virtual void print_epilog(output &out) const { out << "} "; }
+    CLONE(integer)
 };
+
+term &f()
+{
+        return !(integer(5)(integer(4) << integer(314)) << integer(3) << integer(2)
+                                       << basic_expr("EXPR") 
+                                       << basic_expr("{AAA}->{DIM}"));
+}
 
 int main()
 {
@@ -39,8 +47,14 @@ int main()
     dir::set_as_default(common);
 
     output out;
-    out << integer(5)(integer(4) << integer(314)) << integer(3) << integer(2) << basic_expr("EXPR") << 
-               basic_expr("{AAA}->{DIM}");
+    out << integer(5)(integer(4) << integer(314)) << integer(3) << integer(2) 
+                                 << basic_expr("EXPR") 
+                                 << basic_expr("{AAA}->{DIM}");
     std::cout << out.get_str() << std::endl;
+
+    output out2;
+    out2 << f();
+    std::cout << out2.get_str() << std::endl;
+
     return 0;
 }
