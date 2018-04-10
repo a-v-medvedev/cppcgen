@@ -21,6 +21,7 @@ struct function_clause : public branch {
         out.level_down();
         out << "}" << "\n\n";
     }
+    CLONE(function_clause)
 };
 
 struct if_clause : public branch {
@@ -36,6 +37,7 @@ struct if_clause : public branch {
         out.level_down();
         out << "}" << "\n";
     }
+    CLONE(if_clause)
 };
 
 struct else_clause : public branch {
@@ -49,6 +51,20 @@ struct else_clause : public branch {
         out.level_down();
         out << "}" << "\n";
     }
+    CLONE(else_clause)
+};
+
+struct block_clause : public branch {
+    block_clause() : branch() { }
+    virtual void print_prolog(output &out) const {
+        out << "{" << "\n";
+        out.level_up();
+    }
+    virtual void print_epilog(output &out) const {
+        out.level_down();
+        out << "}" << "\n";
+    }
+    CLONE(block_clause)
 };
 
 struct for_clause : public branch {
@@ -67,12 +83,14 @@ struct for_clause : public branch {
         out.level_down();
         out << "}" << "\n";
     }
+    CLONE(for_clause)
 };
 
 struct return_clause : public branch {
     return_clause() : branch() {}
     virtual void print_prolog(output &out) const { out << "return "; }
     virtual void print_epilog(output &out) const { out << ";\n"; }
+    CLONE(return_clause)
 };
 
 struct assignment_clause : public serial {
@@ -83,6 +101,7 @@ struct assignment_clause : public serial {
     virtual void print_self(output &out) const { 
         out << basic_expr(lval) << " = " << basic_expr(rval) << ";\n";
     }
+    CLONE(assignment_clause)
 };
 
 struct decl_assignment_clause : public serial {
@@ -96,6 +115,7 @@ struct decl_assignment_clause : public serial {
         out << basic_expr(type) << " " << basic_expr(lval) << " = "
             << basic_expr(rval) << ";\n";
     }
+    CLONE(decl_assignment_clause)
 };
 
 }

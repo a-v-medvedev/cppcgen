@@ -25,12 +25,25 @@
 #include "cppcgen_basic_expr.h"
 #include "cppcgen_output.h"
 
+#define CLONE_EMPTY(CLASS)     virtual term &clone() const { return *const_cast<CLASS *>(this); }
+#define CLONE(CLASS)     virtual term &clone() const { \
+                             term *ptr = new CLASS(*this); \
+                             expression_directory::saver::save(ptr); \
+                             return *ptr; \
+                         }
+
 namespace cppcgen {
 
 struct term {
     const term *chained;
     term() : chained(NULL) {}
     virtual void print(output &out) const = 0;
+    virtual const term &operator()(const term &_nested) { (void)_nested; return *this; }
+    virtual const term &operator()(const branch &_nested) { (void)_nested; return *this; }
+    virtual const term &operator()(const serial &_nested) { (void)_nested; return *this; }
+    virtual term &operator !() const { return this->clone(); }
+    virtual ~term() {}
+    CLONE_EMPTY(term)
 };
 
 struct serial : public term {
@@ -44,14 +57,16 @@ struct serial : public term {
         print_self(out);
         if (chained) chained->print(out); 
     }
+    virtual ~serial() {}
+    CLONE(serial)
 };
 
 struct branch : public term {
     const term *nested;
     branch() : term(), nested(NULL) {}
-    const term &operator()(const term &_nested) { nested = &_nested; return *this; }
-    const term &operator()(const branch &_nested) { nested = &_nested; return *this; }
-    const term &operator()(const serial &_nested) { nested = &_nested; return *this; }
+    virtual const term &operator()(const term &_nested) { nested = &_nested.clone(); return *this; }
+    virtual const term &operator()(const branch &_nested) { nested = &_nested.clone(); return *this; }
+    virtual const term &operator()(const serial &_nested) { nested = &_nested.clone(); return *this; }
     virtual void print_prolog(output &out) const = 0;
     virtual void print_epilog(output &out) const = 0;
     virtual void print(output &out) const final { 
@@ -60,6 +75,8 @@ struct branch : public term {
         print_epilog(out); 
         if (chained) chained->print(out); 
     }
+    virtual ~branch() {}
+    CLONE_EMPTY(branch)
 };
 
 output &operator<<(output &out, const term &t);

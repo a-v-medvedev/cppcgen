@@ -83,6 +83,15 @@ namespace cppcgen {
         va_end(argList);
     }
 
+    static inline std::string  Format(const char *Format, ...) {
+        std::string str;
+        va_list argList;
+        va_start(argList, Format);
+        FormatV(str, Format, argList);
+        va_end(argList);
+        return str;
+    }
+
     static inline void Delete(std::string &str, size_t pos, size_t count) { 
         str.erase(str.begin() + pos, str.begin() + pos + count); 
     }

@@ -19,6 +19,7 @@
 
  
 #include "cppcgen_exprdir.h"
+#include "cppcgen_term.h"
 
 namespace cppcgen {
 
@@ -39,5 +40,24 @@ expression_class &operator <<(expression_class &cl, std::vector<std::pair<const 
     }
     return cl;
 }
+
+expression_directory::saver expression_directory::saver::instance;
+std::vector<term *> *expression_directory::saver::storage;
+void expression_directory::saver::save(term *ptr)
+{
+    storage->push_back(ptr);
+}
+
+expression_directory::saver::saver() {
+    storage = new std::vector<term *>;
+}
+
+expression_directory::saver::~saver() {
+    for (size_t i = 0; i < storage->size(); i++) {
+        delete (*storage)[i];
+    }
+    delete storage;
+}
+
 
 }

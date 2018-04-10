@@ -49,7 +49,17 @@ struct expression_class {
     friend expression_class &operator <<(expression_class &cl, std::vector<std::pair<const std::string, const std::string> > macroses);
 };
 
+class term;
+
 struct expression_directory {
+    struct saver {
+        saver();
+        static saver instance;
+        static std::vector<term *> *storage;
+        static void save(term *ptr);
+        ~saver();
+    };
+
     static map_helper<std::vector<pair<std::string> > *> directory;
     static map_helper<size_t> expr_dir;
     static std::vector<expression> expr_dir_array;
