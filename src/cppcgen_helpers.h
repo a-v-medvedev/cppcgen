@@ -54,11 +54,13 @@ namespace cppcgen {
 
     static inline std::string Right(std::string &str, size_t pos) { 
         if (pos == 0) return std::string(""); 
-        if (pos >= str.length()) return str; return str.substr(str.length() - pos, pos); 
+        if (pos >= str.length()) return str; 
+        return str.substr(str.length() - pos, pos); 
     }
     static inline std::string Left(std::string &str, size_t pos) { 
         if (pos == 0) return std::string(""); 
-        if (pos >= str.length()) return str; return str.substr(0, pos); 
+        if (pos >= str.length()) return str; 
+        return str.substr(0, pos); 
     }
 
 
