@@ -36,6 +36,13 @@ output &operator<<(output &out, const std::string &s) {
     if (out.newline)
         out.s << spaces;
     out.s << str;
+
+#if 0
+    if (out.newline)
+        std::cout << spaces;
+    std::cout << str;
+#endif
+
     out.newline = (str[str.length()-1] == '\n');
     return out; 
 }

@@ -37,10 +37,10 @@ static inline std::vector<macro> set_macroses(const char *f, const char *t,
     return m;
 }
 
-#define FOR_EACH_IN_LIST(ARR, EXPR, SIZE) std::vector<std::string> ARR; \
+#define FOR_EACH_IN_LIST(ITER, SIZE, ARR, EXPR) std::vector<std::string> ARR; \
                                     Helpers::Split(basic_expr(EXPR).translate(), ',', ARR); \
                                     size_t SIZE = ARR.size(); \
-                                    for (size_t i = 0; i < SIZE; i++) 
+                                    for (size_t ITER = 0; ITER < SIZE; ITER ++) 
 
 int translate_to_int(std::string expr)
 {
@@ -61,13 +61,13 @@ void make_combinations(std::vector<std::vector<macro> > &combinations) {
                 };
                 break;
         case 3: combinations = std::vector<std::vector<macro> > {
-                    { { "it1", "d1" }, { "it2", "d2" }, { "it3", "d3" } },
-                    { { "it1", "d2" }, { "it2", "d3" }, { "it3", "d1" } },
-                    { { "it1", "d1" }, { "it2", "d3" }, { "it3", "d2" } }
+                    { { "it1", "d2" }, { "it2", "d1" }, { "it3", "d3" } },
+                    { { "it1", "d3" }, { "it2", "d2" }, { "it3", "d1" } },
+                    { { "it1", "d3" }, { "it2", "d1" }, { "it3", "d2" } }
                 };
                 break;
         default:
-            FOR_EACH_IN_LIST(dirs, "{ALL_DIRECTIONS}", ndim) {
+            FOR_EACH_IN_LIST(i, ndim, dirs, "{ALL_DIRECTIONS}") {
                 auto dirs_without_const_dir = dirs;
                 dirs_without_const_dir.erase(dirs_without_const_dir.begin() + i);
                 std::vector<macro> comb;

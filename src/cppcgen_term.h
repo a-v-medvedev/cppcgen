@@ -66,11 +66,29 @@ struct serial : public term {
 };
 
 struct branch : public term {
-    const term *nested;
+    term *nested;
     branch() : term(), nested(NULL) {}
-    virtual const term &operator()(const term &_nested) { nested = &_nested.clone(); return *this; }
-    virtual const term &operator()(const branch &_nested) { nested = &_nested.clone(); return *this; }
-    virtual const term &operator()(const serial &_nested) { nested = &_nested.clone(); return *this; }
+    virtual const term &operator()(const term &_nested) { 
+        if (nested)
+            nested->operator()(_nested);
+        else
+            nested = &_nested.clone(); 
+        return *this; 
+    }
+    virtual const term &operator()(const branch &_nested) { 
+        if (nested)
+            nested->operator()(_nested);
+        else
+            nested = &_nested.clone(); 
+        return *this; 
+    }
+    virtual const term &operator()(const serial &_nested) { 
+        if (nested)
+            nested->operator()(_nested);
+        else
+            nested = &_nested.clone(); 
+        return *this; 
+    }
     virtual void print_prolog(output &out) const = 0;
     virtual void print_epilog(output &out) const = 0;
     virtual void print(output &out) const final { 
