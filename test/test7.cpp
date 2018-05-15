@@ -27,8 +27,8 @@ using namespace cppcgen;
 typedef expression_directory dir;
 typedef std::pair<const std::string, const std::string> macro;
 
-static inline std::vector<macro> set_macroses(const char *f, const char *t, 
-                                              const std::vector<macro> &v)
+static inline std::vector<macro> format_macroses(const char *f, const char *t, 
+                                                 const std::vector<macro> &v)
 {
     std::vector<macro> m;
     for (auto it = v.begin(); it != v.end(); it++) {
@@ -97,53 +97,95 @@ term &make_nested_loops(int dim)
     }
 }
 
+term &make_all_assignments(int bthick) {
+    switch (bthick) {
+        case 1:
+            return !assignment_clause("arr[idx]", "arr[idx + ({sign}) * ({{const_direction}_step})]");
+        case 2:
+            return !(assignment_clause("arr[idx]", 
+                                      "arr[idx + ({sign}) * ({{const_direction}_step})]") 
+                     << assignment_clause("arr[idx - ({sign}) * ({{const_direction}_step})]", 
+                                          "arr[idx + ({sign}) * ({{const_direction}_step})]"));
+        default:
+            assert(false);
+    }
+}
+
 int main()
 {
     output out;
 
-    auto bound = dir::add_class("Boundary");
-    dir::set_as_default(bound);    
- 
-    bound << set_macroses("start_%s", "%s", { {"d1","1"}, {"d2","1"}, {"d3","1"}, {"d4","1"}} ); 
-    bound << set_macroses("stop_%s", "({bnd_%s}-1)", { {"d1","d1"}, {"d2","d2"}, {"d3","d3"}, {"d4","d4"}});
-    bound << set_macroses("bnd_%s", "%s", { {"d0", "1"}, {"d1","D1"}, {"d2","D2"}, {"d3","D3"}, {"d4","D4"}});
-    bound << set_macroses("%s_step", "$EACH${{bnd_{D}} @ D=%s @ * }", { {"d1","d0"}, {"d2","d0,d1"}, {"d3","d0,d1,d2"}, {"d4","d0,d1,d2,d3"}});
+    out << "// Test it:  ./test7 > test7_autogen.cpp && g++ -g -O0 test7_stub.cpp test7_autogen.cpp && ./a.out\n\n";
+    out << "#include <stdlib.h>\n\n";
 
-    bound << macro { "const_direction", "{it{NDIM}}" };
-    bound << macro { "ALL_DIRECTIONS", "$EACH${d{N} @ N=$SEQ${1..{NDIM}} @,}" };
-    bound << macro { "args", "$EACH${size_t {bnd_{D}} @ D={ALL_DIRECTIONS} @, }" };
+    auto macroses = dir::add_class("Boundary");
+    dir::set_as_default(macroses);    
 
-    bound << macro { "idx_calc", "$EACH${{DIR} * {{DIR}_step} @ DIR={ALL_DIRECTIONS} @ + }" };
-    bound << macro { "new_value", "arr[idx + ({sign}) * ({{const_direction}_step})]" };
+    int bthick = 1;  // single-cell boundary
+//    int bthick = 2; // dual-cell boundary
+    macroses << macro { "bnd_thickness", Format("%d", bthick) };
+     
+    macroses << format_macroses("start_%s", "%s", { {"d1","0"}, {"d2","0"}, {"d3","0"}, {"d4","0"}} ); 
+    macroses << format_macroses("stop_%s", "({bnd_%s})", { {"d1","d1"}, {"d2","d2"}, {"d3","d3"}, {"d4","d4"}});
+    macroses << format_macroses("bnd_%s", "%s", { {"d0", "1"}, {"d1","D1"}, {"d2","D2"}, {"d3","D3"}, {"d4","D4"}});
+    macroses << format_macroses("%s_step", "$EACH${{bnd_{D}} @ D=%s @ * }", { {"d1","d0"}, {"d2","d0,d1"}, {"d3","d0,d1,d2"}, {"d4","d0,d1,d2,d3"}});
+
+    macroses << macro { "const_direction", "{it{NDIM}}" };
+    macroses << macro { "ALL_DIRECTIONS", "$EACH${d{N} @ N=$SEQ${1..{NDIM}} @,}" };
+    macroses << macro { "args", "$EACH${size_t {bnd_{D}} @ D={ALL_DIRECTIONS} @, }" };
+
+    macroses << macro { "idx_calc", "$EACH${{DIR} * {{DIR}_step} @ DIR={ALL_DIRECTIONS} @ + }" };
 
     std::vector<std::vector<macro> > front_or_rear =
     {
-        { { "const_coord_value", "0" }, { "sign", "1" } },
-        { { "const_coord_value", "{bnd_{const_direction}}" }, { "sign", "-1" } }
+        { { "const_coord_value", "{bnd_thickness}-1" }, { "sign", "1" } },
+        { { "const_coord_value", "{bnd_{const_direction}}-{bnd_thickness}" }, { "sign", "-1" } }
     };
 
-    std::vector<std::vector<macro> > combinations;
-  
+    for (int ndim = 1; ndim <= 4; ndim++) {
+        // Reset the Number Of Dimensions macro first
+        macroses << macro { "NDIM", to_string(ndim) };
 
-    for (int ndim = 1; ndim < 5; ndim++) {
-        bound << macro { "NDIM", to_string(ndim) };
+        // Declare a i-dimensions update function clause
+        function_clause update("void", "update_boundary_{NDIM}D", "double *arr, {args}");
+        output function_body;
+        update(
+            function_body
+        );
+
+        // Now fill in the function_body with the apropriate contents
+
+        // Update macroses to describe all the boundaries we have for i-dimensions case
+        std::vector<std::vector<macro> > combinations;
         make_combinations(combinations);
+
+        // Create all the loops we need for each boundary
         term &all_loops = make_nested_loops(ndim);
-        function_clause upd("void", "update_boundary_{NDIM}D", "double *arr, {args}");
-        upd.print_prolog(out);
+       
+        // Go through all the boundaries
         for (size_t i = 0; i < combinations.size(); i++) {
-            bound << combinations[i];
+            macroses << combinations[i];
+            // Switch 'front' and 'rear' case for each boundary
             for (size_t j = 0; j < front_or_rear.size(); j++) {
-                bound << front_or_rear[j];
-                out <<          
+                macroses << front_or_rear[j];
+
+                // Create all the assignments to do inside a loop
+                term &all_assignments = make_all_assignments(bthick);
+
+                // Put is all together
+                function_body <<          
                     all_loops(
                         decl_assignment_clause("size_t", "{const_direction}",  "{const_coord_value}") 
                         << decl_assignment_clause("size_t", "idx", "{idx_calc}") 
-                        << assignment_clause("arr[idx]", "{new_value}")
+                        << all_assignments
                     );
             }
         }
-        upd.print_epilog(out);
+        
+        // Render the whole i-dimensions function into output.
+        // We can't do this rendering later, since we change most macroses 
+        // when go to the next dimension
+        out << update;
     }
     std::cout << out.get_str();
     return 0;

@@ -67,7 +67,7 @@ all: sandbox
 
 sandbox: $(TEST_BIN)
 	@mkdir -p sandbox
-	@cp $(CPPCGEN_FILE) $(TEST_BIN) sandbox
+	@cp $(CPPCGEN_FILE) $(TEST_BIN) test/test7_stub.cpp  sandbox
 
 $(TEST1_BIN): $(TEST1_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(CPPCGEN_LIB_DIR) -l$(CPPCGEN_SHORT) -Wl,-rpath=.

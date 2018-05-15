@@ -42,7 +42,7 @@ class output {
 
     public:
     output() : level(0), newline(false) {}
-    std::string get_str() { return s.str(); }
+    std::string get_str() const { return s.str(); }
     void level_up() { level++; }
     void level_down() { level--; }
 };

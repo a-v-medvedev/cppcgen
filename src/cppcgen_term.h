@@ -38,12 +38,32 @@ struct term {
     const term *chained;
     term() : chained(NULL) {}
     virtual void print(output &out) const = 0;
+    virtual const term &operator()(const output &out) { (void)out; return *this; }
     virtual const term &operator()(const term &_nested) { (void)_nested; return *this; }
     virtual const term &operator()(const branch &_nested) { (void)_nested; return *this; }
     virtual const term &operator()(const serial &_nested) { (void)_nested; return *this; }
     virtual term &operator !() const { return this->clone(); }
     virtual ~term() {}
     CLONE_EMPTY(term)
+};
+
+struct just_string : public term {
+    const output *body;
+    just_string() : term(), body(NULL) {}
+    just_string(const just_string &other) : term(other) { 
+        if (other.body) body = other.body;
+        else body = NULL;
+    }
+    explicit just_string(const output &_body) : term() { body = &_body; }
+    virtual void print_self(output &out) const {
+        if (body) { out << body->get_str(); }
+    }
+    virtual void print(output &out) const final {
+        print_self(out);
+        if (chained) chained->print(out); 
+    }
+    virtual ~just_string() { }
+    CLONE(just_string)
 };
 
 struct serial : public term {
@@ -68,6 +88,13 @@ struct serial : public term {
 struct branch : public term {
     term *nested;
     branch() : term(), nested(NULL) {}
+    virtual const term &operator()(const output &out) { 
+        if (nested)
+            nested->operator()(out);
+        else
+            nested = &just_string(out).clone(); 
+        return *this; 
+    }
     virtual const term &operator()(const term &_nested) { 
         if (nested)
             nested->operator()(_nested);
