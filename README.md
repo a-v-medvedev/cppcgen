@@ -224,11 +224,11 @@ Output:
 ```
 
 The `test/` subirectory of this projects may give a basic insight
-on the code usage.
+of the library usage.
 
-The most advanced test7.cpp implements popular pattern of boundary update for
-1D, 2D, 3D and 4D regilar grids for single-cell and dual-cell boundaries. 
-You can test if the generated code works with a line like this:
+The most advanced test7.cpp implements a popular pattern of a boundary update for
+1D, 2D, 3D and 4D regular grids for single-cell and dual-cell boundaries. 
+You can test if the generated code works well with a line like this:
 ```
 ./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
 ```
