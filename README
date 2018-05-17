@@ -101,13 +101,11 @@ Output:
 auto common = dir::add_class("Common");
 dir::set_as_default(common);
 output out;
-out <<  function_clause("int",
-                        "min",
-                        "int a, int b")(
+out <<  function_clause("int", "min", "int a, int b")(
             if_clause("a <= b")( 
-                return_clause()(basic_expr("a"))
+                return_clause()("a")
             ) << else_clause()(
-                return_clause()(basic_expr("b"))
+                return_clause()("b")
             )
         );
 std::cout << out.get_str();
@@ -134,13 +132,11 @@ auto common = dir::add_class("Common");
 
 dir::set_as_default(common);
 output out;
-out <<  function_clause("{type}",
-                        "{func_name}",
-                        "{type} {arg1}, {type} {arg2}")(
+out <<  function_clause("{type}", "{func_name}", "{type} {arg1}, {type} {arg2}")(
             if_clause("{arg1} {bin_operation} {arg2}")(
-                return_clause()(basic_expr("{arg1}"))
+                return_clause()("{arg1}")
             ) << else_clause()(
-                return_clause()(basic_expr("{arg2}"))
+                return_clause()("{arg2}")
             )
         );
 std::cout << out.get_str();
@@ -198,7 +194,7 @@ Output:
 >         return b;
 >     }
 > }
-> 
+>
 > float max(float a, float b) {
 >     if (a >= b){
 >         return a;
@@ -207,7 +203,7 @@ Output:
 >         return b;
 >     }
 > }
-> 
+>
 > int min(int a, int b) {
 >     if (a <= b){
 >         return a;
@@ -216,7 +212,7 @@ Output:
 >         return b;
 >     }
 > }
-> 
+>
 > float min(float a, float b) {
 >     if (a <= b){
 >         return a;
@@ -229,6 +225,13 @@ Output:
 
 The `test/` subirectory of this projects may give a basic insight
 on the code usage.
+
+The most advanced test7.cpp implements popular pattern of boundary update for
+1D, 2D, 3D and 4D regilar grids for single-cell and dual-cell boundaries. 
+You can test if the generated code works with a line like this:
+```
+./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
+```
 
 
 ## Build instructions
@@ -261,4 +264,5 @@ Run tests with the commands like:
 ...
 ```
 Testing coverage is not elaborated yet. Let's hope the tests cover the functionality well.
+
 
