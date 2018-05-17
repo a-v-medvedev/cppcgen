@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include "cppcgen.h"
+#include "cppcgen_utils.h"
 
 using namespace cppcgen;
 
@@ -70,8 +71,8 @@ void find_arrangements(std::string str, std::vector<std::string> &result, int r)
 
 int main()
 {
-    typedef expression_directory dir;
-    typedef std::pair<const std::string, const std::string> macro;
+//    typedef expression_directory dir;
+//    typedef std::pair<const std::string, const std::string> macro;
 
     output out;
 
@@ -89,12 +90,12 @@ int main()
         std::vector<std::string> permutations;
         find_permutations("int,float,double,std::string", permutations);
         for (size_t i = 0; i < permutations.size(); i++) {
-            dir::add_macro("Sum", "types", permutations[i].c_str());
+            sum << macro { "types", permutations[i] };
             out << 
                function_clause("{RETURN_TYPE}", 
                                "sum", 
                                "$EACH${{type} {arg} @ type={types};arg={args} @, }") (
-                   return_clause()(basic_expr("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })"))
+                   return_clause()("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })")
                );
         }
     }
@@ -106,12 +107,12 @@ int main()
             sum << macro { "N", to_string(j) };
             sum << macro { "args", "$EACH${arg{I} @ I=$SEQ${1..{N}} @,}" };
             for (size_t i = 0; i < arrangements.size(); i++) {
-                sum << macro { "types", arrangements[i].c_str() };
+                sum << macro { "types", arrangements[i] };
                 out << 
                     function_clause("{RETURN_TYPE}", 
                                     "sum", 
                                     "$EACH${{type} {arg} @ type={types};arg={args} @, }") (
-                        return_clause()(basic_expr("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })"))
+                        return_clause()("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })")
                     );
             }
         }

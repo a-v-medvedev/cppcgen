@@ -23,7 +23,7 @@ LIB = lib/libcppcgen.so
 
 SRC = src/term.cpp src/expr.cpp src/exprdir.cpp src/basic_expr.cpp src/expression.cpp
 OBJ = $(subst .cpp,.o,$(SRC))
-HDR = src/cppcgen_basic_expr.h src/cppcgen_output.h src/cppcgen_exprdir.h src/cppcgen_helpers.h src/cppcgen_term.h src/cppcgen_pair.h src/cppcgen_expr.h src/cppcgen_expression.h src/cppcgen.h src/cppcgen_basic_syntax.h
+HDR = src/cppcgen_basic_expr.h src/cppcgen_output.h src/cppcgen_exprdir.h src/cppcgen_helpers.h src/cppcgen_term.h src/cppcgen_pair.h src/cppcgen_expr.h src/cppcgen_expression.h src/cppcgen.h src/cppcgen_basic_syntax.h src/cppcgen_utils.h
 
 override CPPFLAGS += -Isrc 
 override CXXFLAGS += -std=c++11 -Wall -Wextra -pedantic -O3 -fPIC

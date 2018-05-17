@@ -28,11 +28,11 @@ int main()
     typedef std::pair<const std::string, const std::string> macro;
 
     auto common = dir::add_class("Common");
-        common << macro { "arg1", "a" }
-               << macro { "arg2", "b" }
-               << macro { "func_name", "min" }
-               << macro { "bin_operation", "<=" }
-               << macro { "type", "int" };
+    common << macro { "arg1", "a" }
+           << macro { "arg2", "b" }
+           << macro { "func_name", "min" }
+           << macro { "bin_operation", "<=" }
+           << macro { "type", "int" };
 
     dir::set_as_default(common);
     output out;
@@ -40,9 +40,9 @@ int main()
                             "{func_name}",
                             "{type} {arg1}, {type} {arg2}")(
                 if_clause("{arg1} {bin_operation} {arg2}")(
-                    return_clause()(basic_expr("{arg1}"))
+                    return_clause()("{arg1}")
                 ) << else_clause()(
-                    return_clause()(basic_expr("{arg2}"))
+                    return_clause()("{arg2}")
                 )
             );
     std::cout << out.get_str();

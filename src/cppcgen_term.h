@@ -38,6 +38,7 @@ struct term {
     const term *chained;
     term() : chained(NULL) {}
     virtual void print(output &out) const = 0;
+    virtual const term &operator()(const std::string &body) { (void)body; return *this; }
     virtual const term &operator()(const output &out) { (void)out; return *this; }
     virtual const term &operator()(const term &_nested) { (void)_nested; return *this; }
     virtual const term &operator()(const branch &_nested) { (void)_nested; return *this; }
@@ -88,6 +89,13 @@ struct serial : public term {
 struct branch : public term {
     term *nested;
     branch() : term(), nested(NULL) {}
+    virtual const term &operator()(const std::string &body) { 
+        if (nested)
+            nested->operator()(body);
+        else
+            nested = &serial(basic_expr(body)).clone(); 
+        return *this; 
+    }
     virtual const term &operator()(const output &out) { 
         if (nested)
             nested->operator()(out);

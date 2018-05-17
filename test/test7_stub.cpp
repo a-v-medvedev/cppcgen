@@ -26,9 +26,9 @@ static inline std::string  Format(const char *Format, ...) {
     return str;
 }
 
-void print(const std::vector<double> &a, size_t d1, size_t d2)    
+void print(const std::string &header, const std::vector<double> &a, size_t d1, size_t d2)    
 {
-    std::cout << std::endl;
+    std::cout << header << std::endl;
     for (size_t i = 0; i < d1; i++) {
         for (size_t j = 0; j < d2; j++) {
             std::cout << Format("%02d", (int)a[i*d2 + j]) << "  ";
@@ -54,8 +54,8 @@ int main(int argc, char **argv)
                     array[i*d2 + j] = (filler += 1.0);
         }
     }
-    print(array, d1, d2);
+    print("Before boundary update:", array, d1, d2);
     update_boundary_2D(&(array[0]), d1, d2);
-    print(array, d1, d2);
+    print("After boundary update:", array, d1, d2);
     return 0;
 }

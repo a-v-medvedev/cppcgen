@@ -21,9 +21,11 @@
 #include <memory>
 #include <assert.h>
 #include "cppcgen.h"
+#include "cppcgen_utils.h"
 
 using namespace cppcgen;
 
+/*
 typedef expression_directory dir;
 typedef std::pair<const std::string, const std::string> macro;
 
@@ -46,6 +48,8 @@ int translate_to_int(std::string expr)
 {
     return from_string(basic_expr(expr).translate());
 }
+*/
+
 
 void make_combinations(std::vector<std::vector<macro> > &combinations) {
     combinations.clear();
