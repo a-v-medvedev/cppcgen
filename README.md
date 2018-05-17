@@ -101,11 +101,11 @@ Output:
 auto common = dir::add_class("Common");
 dir::set_as_default(common);
 output out;
-out <<  function_clause("int", "min", "int a, int b")(
-            if_clause("a <= b")( 
-                return_clause()("a")
-            ) << else_clause()(
-                return_clause()("b")
+out <<  function_("int", "min", "int a, int b")(
+            if_("a <= b")( 
+                return_("a")
+            ) << else_()(
+                return_("b")
             )
         );
 std::cout << out.get_str();
@@ -132,11 +132,11 @@ auto common = dir::add_class("Common");
 
 dir::set_as_default(common);
 output out;
-out <<  function_clause("{type}", "{func_name}", "{type} {arg1}, {type} {arg2}")(
-            if_clause("{arg1} {bin_operation} {arg2}")(
-                return_clause()("{arg1}")
-            ) << else_clause()(
-                return_clause()("{arg2}")
+out <<  function_("{type}", "{func_name}", "{type} {arg1}, {type} {arg2}")(
+            if_("{arg1} {bin_operation} {arg2}")(
+                return_("{arg1}")
+            ) << else_()(
+                return_("{arg2}")
             )
         );
 std::cout << out.get_str();
@@ -174,11 +174,11 @@ Output:
         common << op;
         for (auto t : types) {
             common << t;
-            out <<  function_clause("{type}", "{func_name}", "{type} a, {type} b")(
-                        if_clause("a {bin_operation} b")(
-                            return_clause()("a")
-                        ) << else_clause()(
-                            return_clause()("b")
+            out <<  function_("{type}", "{func_name}", "{type} a, {type} b")(
+                        if_("a {bin_operation} b")(
+                            return_("a")
+                        ) << else_()(
+                            return_("b")
                         )
             );
         }
@@ -228,7 +228,7 @@ of the library usage.
 
 The most advanced test7.cpp implements a popular pattern of a boundary update for
 1D, 2D, 3D and 4D regular grids for single-cell and dual-cell boundaries. 
-You can test if the generated code works well with a line like this:
+You can test if the generated code works well with a line similar to this one:
 ```
 ./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
 ```

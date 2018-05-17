@@ -19,14 +19,12 @@
 
 #include <iostream>
 #include "cppcgen.h"
+#include "cppcgen_utils.h"
 
 using namespace cppcgen;
 
 int main()
 {
-    typedef expression_directory dir;
-    typedef std::pair<const std::string, const std::string> macro;
-
     auto common = dir::add_class("Common");
     common << macro { "arg1", "a" }
            << macro { "arg2", "b" }
@@ -35,16 +33,44 @@ int main()
            << macro { "type", "int" };
 
     dir::set_as_default(common);
-    output out;
-    out <<  function_clause("{type}",
-                            "{func_name}",
-                            "{type} {arg1}, {type} {arg2}")(
-                if_clause("{arg1} {bin_operation} {arg2}")(
-                    return_clause()("{arg1}")
-                ) << else_clause()(
-                    return_clause()("{arg2}")
-                )
-            );
-    std::cout << out.get_str();
+    {
+        output out;
+        out <<  function_("{type}", "{func_name}", "{type} {arg1}, {type} {arg2}")(
+                    if_("{arg1} {bin_operation} {arg2}")(
+                        return_()("{arg1}")
+                    ) << else_()(
+                        return_()("{arg2}")
+                    )
+                );
+        std::cout << out.get_str();
+    }
+    {
+        output out;
+
+        std::vector<std::vector<macro>> operators = {
+            { {"func_name", "max"}, {"bin_operation", ">="} },
+            { {"func_name", "min"}, {"bin_operation", "<="} }
+        };
+
+        std::vector<macro> types = {
+            { "type", "int" },
+            { "type", "float" }
+        };
+
+        for (auto op : operators) {
+            common << op;
+            for (auto t : types) {
+                common << t;
+                out <<  function_clause("{type}", "{func_name}", "{type} a, {type} b")(
+                            if_clause("a {bin_operation} b")(
+                                return_clause()("a")
+                            ) << else_clause()(
+                                return_clause()("b")
+                            )
+                );
+            }
+        }
+        std::cout << out.get_str();
+    }
     return 0;
 }

@@ -25,9 +25,22 @@
 
 using namespace cppcgen;
 
-void make_combinations(std::vector<std::vector<macro> > &combinations) {
-    combinations.clear();
-    int ndim = translate_to_int("{NDIM}");
+std::vector<macro> generate_basic_macroses() {
+    std::vector<macro> basic;
+    basic += format_macroses("bnd_%s", "%s", { {"d0", "1"}, {"d1","D1"}, {"d2","D2"}, {"d3","D3"}, {"d4","D4"}});
+    basic += format_macroses("%s_step", "$EACH${{bnd_{D}} @ D=%s @ * }", { {"d1","d0"}, {"d2","d0,d1"}, {"d3","d0,d1,d2"}, {"d4","d0,d1,d2,d3"}});
+
+    basic += macro { "const_direction", "{it{NDIM}}" };
+    basic += macro { "ALL_DIRECTIONS", "$EACH${d{N} @ N=$SEQ${1..{NDIM}} @,}" };
+    basic += macro { "args", "$EACH${size_t {bnd_{D}} @ D={ALL_DIRECTIONS} @, }" };
+
+    basic += macro { "idx_calc", "$EACH${{DIR} * {{DIR}_step} @ DIR={ALL_DIRECTIONS} @ + }" };
+    return basic;
+}
+
+std::vector<std::vector<macro>> generate_boundary_macroses() {
+    int ndim = macro_to_int("{NDIM}");
+    std::vector<std::vector<macro>> combinations;
     switch (ndim) {
         case 1: combinations = std::vector<std::vector<macro> > {
                     { { "it1", "d1" } }
@@ -55,19 +68,29 @@ void make_combinations(std::vector<std::vector<macro> > &combinations) {
                 combinations.push_back(comb);
             }
     }
+    return combinations;
 }
 
-term &make_nested_loops(int dim) 
+std::vector<std::vector<macro>> generate_front_rear_macroses()
 {
-    switch (dim) {
+    return std::vector<std::vector<macro>> {
+        { { "const_coord_value", "{NCELLS}-1" }, { "sign", "1" } },
+        { { "const_coord_value", "{bnd_{const_direction}}-{NCELLS}" }, { "sign", "-1" } }
+    };
+}
+
+term &generate_nested_loops_operators() 
+{
+    int ndim = macro_to_int("{NDIM}");
+    switch (ndim) {
         case 1: return !block_clause();
-        case 2: return !for_clause("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++");
-        case 3: return !for_clause("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++")(
-                           for_clause("size_t {it2} = {start_{it2}}", "{it2} < {stop_{it2}}", "{it2}++")
+        case 2: return !for_("size_t {it1} = 0", "{it1} < {bnd_{it1}}", "{it1}++");
+        case 3: return !for_("size_t {it1} = 0", "{it1} < {bnd_{it1}}", "{it1}++")(
+                           for_("size_t {it2} = 0", "{it2} < {bnd_{it2}}", "{it2}++")
                        );
-        case 4: return !for_clause("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++")(
-                            for_clause("size_t {it2} = {start_{it2}}", "{it2} < {stop_{it2}}", "{it2}++")(
-                                for_clause("size_t {it3} = {start_{it3}}", "{it3} < {stop_{it3}}", "{it3}++")
+        case 4: return !for_("size_t {it1} = 0", "{it1} < {bnd_{it1}}", "{it1}++")(
+                            for_("size_t {it2} = 0", "{it2} < {bnd_{it2}}", "{it2}++")(
+                                for_("size_t {it3} = 0", "{it3} < {bnd_{it3}}", "{it3}++")
                            )  
                        );
  
@@ -75,15 +98,16 @@ term &make_nested_loops(int dim)
     }
 }
 
-term &make_all_assignments(int bthick) {
-    switch (bthick) {
+term &generate_inloop_assignment_operators() {
+    int ncells = macro_to_int("{NCELLS}");
+    switch (ncells) {
         case 1:
-            return !assignment_clause("arr[idx]", "arr[idx + ({sign}) * ({{const_direction}_step})]");
+            return !assign_("arr[idx]", "arr[idx + ({sign}) * ({{const_direction}_step})]");
         case 2:
-            return !(assignment_clause("arr[idx]", 
-                                      "arr[idx + ({sign}) * ({{const_direction}_step})]") 
-                     << assignment_clause("arr[idx - ({sign}) * ({{const_direction}_step})]", 
-                                          "arr[idx + ({sign}) * ({{const_direction}_step})]"));
+            return !(assign_("arr[idx]", 
+                             "arr[idx + ({sign}) * ({{const_direction}_step})]") 
+                     << assign_("arr[idx - ({sign}) * ({{const_direction}_step})]", 
+                                "arr[idx + ({sign}) * ({{const_direction}_step})]"));
         default:
             assert(false);
     }
@@ -98,72 +122,57 @@ int main()
 
     auto macroses = dir::add_class("Boundary");
     dir::set_as_default(macroses);    
-
-    int bthick = 1;  // single-cell boundary
-//    int bthick = 2; // dual-cell boundary
-    macroses << macro { "bnd_thickness", Format("%d", bthick) };
+    macroses << generate_basic_macroses();
      
-    macroses << format_macroses("start_%s", "%s", { {"d1","0"}, {"d2","0"}, {"d3","0"}, {"d4","0"}} ); 
-    macroses << format_macroses("stop_%s", "({bnd_%s})", { {"d1","d1"}, {"d2","d2"}, {"d3","d3"}, {"d4","d4"}});
-    macroses << format_macroses("bnd_%s", "%s", { {"d0", "1"}, {"d1","D1"}, {"d2","D2"}, {"d3","D3"}, {"d4","D4"}});
-    macroses << format_macroses("%s_step", "$EACH${{bnd_{D}} @ D=%s @ * }", { {"d1","d0"}, {"d2","d0,d1"}, {"d3","d0,d1,d2"}, {"d4","d0,d1,d2,d3"}});
+    for (int ncells = 1; ncells <= 2; ncells++) {
+        macroses << int_to_macro("NCELLS", ncells); 
+        for (int ndim = 1; ndim <= 4; ndim++) {
+            // Reset the Number Of Dimensions macro first
+            macroses << int_to_macro("NDIM", ndim); 
 
-    macroses << macro { "const_direction", "{it{NDIM}}" };
-    macroses << macro { "ALL_DIRECTIONS", "$EACH${d{N} @ N=$SEQ${1..{NDIM}} @,}" };
-    macroses << macro { "args", "$EACH${size_t {bnd_{D}} @ D={ALL_DIRECTIONS} @, }" };
+            // Declare a i-dimensions update function clause
+            function_ update("void", "update_boundary_{NCELLS}C_{NDIM}D", "double *arr, {args}");
+            output function_body;
+            update(
+                function_body
+            );
 
-    macroses << macro { "idx_calc", "$EACH${{DIR} * {{DIR}_step} @ DIR={ALL_DIRECTIONS} @ + }" };
+            // Now fill in the function_body with the apropriate contents
 
-    std::vector<std::vector<macro> > front_or_rear =
-    {
-        { { "const_coord_value", "{bnd_thickness}-1" }, { "sign", "1" } },
-        { { "const_coord_value", "{bnd_{const_direction}}-{bnd_thickness}" }, { "sign", "-1" } }
-    };
+            // Update macroses to describe all the boundary kinds we have for i-dimensions case
+            auto boundary_kinds = generate_boundary_macroses();
 
-    for (int ndim = 1; ndim <= 4; ndim++) {
-        // Reset the Number Of Dimensions macro first
-        macroses << macro { "NDIM", to_string(ndim) };
+            // Update macroses which switch front and rear boundary of a given kind
+            auto front_or_rear = generate_front_rear_macroses();
 
-        // Declare a i-dimensions update function clause
-        function_clause update("void", "update_boundary_{NDIM}D", "double *arr, {args}");
-        output function_body;
-        update(
-            function_body
-        );
+            // Get the operators for all the loops we have for each boundary
+            term &all_loops = generate_nested_loops_operators();
 
-        // Now fill in the function_body with the apropriate contents
+            // Get all operators for the useful assignments to do inside a loop
+            term &all_assignments = generate_inloop_assignment_operators();
+          
+            // Go through all the boundaries
+            for (auto &boundary : boundary_kinds) {
+                macroses << boundary;
+                // Switch 'front' and 'rear' case for each boundary
+                for (auto &f_or_r : front_or_rear) {
+                    macroses << f_or_r;
 
-        // Update macroses to describe all the boundaries we have for i-dimensions case
-        std::vector<std::vector<macro> > combinations;
-        make_combinations(combinations);
-
-        // Create all the loops we need for each boundary
-        term &all_loops = make_nested_loops(ndim);
-       
-        // Go through all the boundaries
-        for (size_t i = 0; i < combinations.size(); i++) {
-            macroses << combinations[i];
-            // Switch 'front' and 'rear' case for each boundary
-            for (size_t j = 0; j < front_or_rear.size(); j++) {
-                macroses << front_or_rear[j];
-
-                // Create all the assignments to do inside a loop
-                term &all_assignments = make_all_assignments(bthick);
-
-                // Put is all together
-                function_body <<          
-                    all_loops(
-                        decl_assignment_clause("size_t", "{const_direction}",  "{const_coord_value}") 
-                        << decl_assignment_clause("size_t", "idx", "{idx_calc}") 
-                        << all_assignments
-                    );
+                    // Put is all together
+                    function_body <<          
+                        all_loops(
+                            assign_("size_t", "{const_direction}",  "{const_coord_value}") 
+                            << assign_("size_t", "idx", "{idx_calc}") 
+                            << all_assignments
+                        );
+                }
             }
+            
+            // Render the whole i-dimensions function into output.
+            // We can't do this rendering later, since we change most macroses 
+            // when go to the next dimension
+            out << update;
         }
-        
-        // Render the whole i-dimensions function into output.
-        // We can't do this rendering later, since we change most macroses 
-        // when go to the next dimension
-        out << update;
     }
     std::cout << out.get_str();
     return 0;

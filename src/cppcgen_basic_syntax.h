@@ -26,7 +26,7 @@ struct function_clause : public branch {
 
 struct if_clause : public branch {
     std::string cond;
-    if_clause(std::string _cond) : branch(), cond(_cond) { }
+    if_clause(const std::string &_cond) : branch(), cond(_cond) { }
     virtual void print_prolog(output &out) const {
         out << "if (";
         out << basic_expr(cond) << ")";
@@ -87,12 +87,15 @@ struct for_clause : public branch {
 };
 
 struct return_clause : public branch {
+    std::string expr;
     return_clause() : branch() {}
-    virtual void print_prolog(output &out) const { out << "return "; }
+    return_clause(const std::string &_expr) : branch(), expr(_expr) {}
+    virtual void print_prolog(output &out) const { out << "return " << basic_expr(expr); }
     virtual void print_epilog(output &out) const { out << ";\n"; }
     CLONE(return_clause)
 };
 
+/*
 struct assignment_clause : public serial {
     std::string lval, rval;
     assignment_clause(std::string _lval, std::string _rval) : serial(),
@@ -103,10 +106,15 @@ struct assignment_clause : public serial {
     }
     CLONE(assignment_clause)
 };
+*/
 
-struct decl_assignment_clause : public serial {
+struct assignment_clause : public serial {
     std::string type, lval, rval;
-    decl_assignment_clause(std::string _type, std::string _lval, std::string _rval) :
+    assignment_clause(std::string _lval, std::string _rval) : serial(),
+                                                              lval(_lval),
+                                                              rval(_rval) {}
+
+    assignment_clause(std::string _type, std::string _lval, std::string _rval) :
                                                               serial(),
                                                               type(_type),
                                                               lval(_lval),
@@ -115,7 +123,7 @@ struct decl_assignment_clause : public serial {
         out << basic_expr(type) << " " << basic_expr(lval) << " = "
             << basic_expr(rval) << ";\n";
     }
-    CLONE(decl_assignment_clause)
+    CLONE(assignment_clause)
 };
 
 }

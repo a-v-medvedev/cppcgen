@@ -23,7 +23,7 @@
 
 using namespace cppcgen;
 
-void find_permutations(std::string str, std::vector<std::string> &result) {
+void generate_permutations(std::string str, std::vector<std::string> &result) {
     std::vector<std::string> parts;
     if (Helpers::Split(str, ",", parts) == 0)
         return;
@@ -56,7 +56,7 @@ void recursive_arrangements(std::vector<std::string> &arr, std::string str,
         recursive_arrangements(arr, str, result, i + j, r - 1);
 }
 
-void find_arrangements(std::string str, std::vector<std::string> &result, int r)
+void generate_arrangements(std::string str, std::vector<std::string> &result, int r)
 {
     std::vector<std::string> parts;
     if (Helpers::Split(str, ",", parts) == 0)
@@ -66,7 +66,7 @@ void find_arrangements(std::string str, std::vector<std::string> &result, int r)
     for (size_t i = 0; i < parts.size(); i++)
         recursive_arrangements(parts, tmp, tmp_result, i, r);
     for (size_t i = 0; i < tmp_result.size(); i++)
-        find_permutations(tmp_result[i], result);
+        generate_permutations(tmp_result[i], result);
 }
 
 int main()
@@ -85,14 +85,14 @@ int main()
     
     {
         std::vector<std::string> permutations;
-        find_permutations("int,float,double,std::string", permutations);
+        generate_permutations("int,float,double,std::string", permutations);
         for (size_t i = 0; i < permutations.size(); i++) {
             sum << macro { "types", permutations[i] };
             out << 
-               function_clause("{RETURN_TYPE}", 
-                               "sum", 
-                               "$EACH${{type} {arg} @ type={types};arg={args} @, }") (
-                   return_clause()("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })")
+               function_("{RETURN_TYPE}", 
+                         "sum", 
+                         "$EACH${{type} {arg} @ type={types};arg={args} @, }") (
+                   return_("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })")
                );
         }
     }
@@ -100,16 +100,16 @@ int main()
     {
         for (size_t j = 2; j < 5; j++) {
             std::vector<std::string> arrangements;
-            find_arrangements("int,float,double,std::string", arrangements, j);
+            generate_arrangements("int,float,double,std::string", arrangements, j);
             sum << macro { "N", to_string(j) };
             sum << macro { "args", "$EACH${arg{I} @ I=$SEQ${1..{N}} @,}" };
             for (size_t i = 0; i < arrangements.size(); i++) {
                 sum << macro { "types", arrangements[i] };
                 out << 
-                    function_clause("{RETURN_TYPE}", 
-                                    "sum", 
-                                    "$EACH${{type} {arg} @ type={types};arg={args} @, }") (
-                        return_clause()("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })")
+                    function_("{RETURN_TYPE}", 
+                              "sum", 
+                              "$EACH${{type} {arg} @ type={types};arg={args} @, }") (
+                        return_("({RETURN_TYPE})($EACH${{{type}_to_{RETURN_TYPE}}({arg}) @ type={types};arg={args} @ + })")
                     );
             }
         }

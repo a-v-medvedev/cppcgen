@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include "cppcgen.h"
+#include "cppcgen_utils.h"
 
 using namespace cppcgen;
 
@@ -79,45 +80,47 @@ int main()
   
     dir::set_as_default(bound);    
     dir::add_to_defaults(b3d);
-    function_clause u3d("void", "update_boundary_{NDIM}D", "double *arr, {args}");
-    u3d.print_prolog(out);
+    output function_body_3d;
     for (size_t i = 0; i < planes.size(); i++) {
         bound << planes[i];
         for (size_t j = 0; j < consts.size(); j++) {
             bound << consts[j];
-            out <<
-                for_clause("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++")(
-                    for_clause("size_t {it2} = {start_{it2}}", "{it2} < {stop_{it2}}", "{it2}++")(
-                        decl_assignment_clause("size_t", "{const_direction}",  "{const_value}") 
-                        << decl_assignment_clause("size_t", "idx", "{idx_calc}") 
-                        << assignment_clause("arr[idx]",
-                                             "arr[idx + ({sign}) * ({{const_direction}_step})]")
+            function_body_3d <<
+                for_("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++")(
+                    for_("size_t {it2} = {start_{it2}}", "{it2} < {stop_{it2}}", "{it2}++")(
+                        assign_("size_t", "{const_direction}",  "{const_value}") 
+                        << assign_("size_t", "idx", "{idx_calc}") 
+                        << assign_("arr[idx]",
+                                   "arr[idx + ({sign}) * ({{const_direction}_step})]")
                     )
                 );
         }
     }
-    u3d.print_epilog(out);
+    out << function_("void", "update_boundary_{NDIM}D", "double *arr, {args}")(
+               function_body_3d
+           );
 
 
 
     dir::set_as_default(bound);    
     dir::add_to_defaults(b2d);
-    function_clause u2d("void", "update_boundary_{NDIM}D", "double *arr, {args}");
-    u2d.print_prolog(out);
+    output function_body_2d;
     for (size_t i = 0; i < lines.size(); i++) {
         bound << lines[i];
         for (size_t j = 0; j < consts.size(); j++) {
             bound << consts[j];
-            out <<
-                for_clause("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++")(
-                    decl_assignment_clause("size_t", "{const_direction}",  "{const_value}") 
-                    << decl_assignment_clause("size_t", "idx", "{idx_calc}") 
-                    << assignment_clause("arr[idx]",
-                                         "arr[idx + ({sign}) * ({{const_direction}_step})]")
+            function_body_2d <<
+                for_("size_t {it1} = {start_{it1}}", "{it1} < {stop_{it1}}", "{it1}++")(
+                    assign_("size_t", "{const_direction}",  "{const_value}") 
+                    << assign_("size_t", "idx", "{idx_calc}") 
+                    << assign_("arr[idx]",
+                               "arr[idx + ({sign}) * ({{const_direction}_step})]")
                 );
             }
     }
-    u2d.print_epilog(out);
+    out << function_("void", "update_boundary_{NDIM}D", "double *arr, {args}")(
+               function_body_2d
+           );
 
     std::cout << out.get_str();
     return 0;

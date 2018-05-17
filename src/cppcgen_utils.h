@@ -4,6 +4,12 @@ namespace cppcgen {
 
 typedef expression_directory dir;
 typedef std::pair<const std::string, const std::string> macro;
+typedef if_clause if_;
+typedef else_clause else_;
+typedef return_clause return_;
+typedef for_clause for_;
+typedef function_clause function_;
+typedef assignment_clause assign_;
 
 static inline std::vector<macro> format_macroses(const char *f, const char *t,
                                                  const std::vector<macro> &v)
@@ -20,9 +26,28 @@ static inline std::vector<macro> format_macroses(const char *f, const char *t,
                                     size_t SIZE = ARR.size(); \
                                     for (size_t ITER = 0; ITER < SIZE; ITER ++)
 
-static inline int translate_to_int(std::string expr)
+static inline int macro_to_int(const std::string &expr)
 {
     return from_string(basic_expr(expr).translate());
+}
+
+static inline macro int_to_macro(const std::string &macro_name, int i) {
+    return macro { macro_name, Format("%d", i) };
+}
+
+std::vector<macro> &operator +=(std::vector<macro> &to,
+                                const std::vector<macro> &from)
+{
+    for (auto &m : from)
+        to.push_back(m);
+    return to;
+}
+
+std::vector<macro> &operator +=(std::vector<macro> &to,
+                                const macro &from)
+{
+    to.push_back(from);
+    return to;
 }
 
 }
