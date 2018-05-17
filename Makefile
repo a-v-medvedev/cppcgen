@@ -35,6 +35,7 @@ all: lib distr tests
 lib: $(LIB)
 
 $(LIB): $(OBJ)
+	@mkdir -p lib
 	$(CXX) -shared -o $@ $^
 
 distr: $(LIB) $(HDR)
@@ -51,7 +52,7 @@ clean:
 	make -f Tests.mak clean
 
 distclean: clean
-	rm -rf distr
+	rm -rf distr lib
 	find src -name '*~' | xargs rm -f
 	rm -f *~
 	@make -f Tests.mak distclean
