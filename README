@@ -157,6 +157,76 @@ Output:
 > }
 ```
 
+#### 8. Extension of previous case for min/max and int/float variation in generated code:
+
+```
+    auto common = dir::add_class("Common");
+    dir::set_as_default(common);
+    output out;
+
+    std::vector<std::vector<macro>> operators = {
+        { {"func_name", "max"}, {"bin_operation", ">="} },
+        { {"func_name", "min"}, {"bin_operation", "<="} }
+    };
+
+    std::vector<macro> types = {
+        { "type", "int" },
+        { "type", "float" }
+    };
+
+    for (auto op : operators) {
+        common << op;
+        for (auto t : types) {
+            common << t;
+            out <<  function_clause("{type}", "{func_name}", "{type} a, {type} b")(
+                        if_clause("a {bin_operation} b")(
+                            return_clause()("a")
+                        ) << else_clause()(
+                            return_clause()("b")
+                        )
+            );
+        }
+    }
+```
+Output:
+```
+> int max(int a, int b) {
+>     if (a >= b){
+>         return a;
+>     }
+>     else {
+>         return b;
+>     }
+> }
+> 
+> float max(float a, float b) {
+>     if (a >= b){
+>         return a;
+>     }
+>     else {
+>         return b;
+>     }
+> }
+> 
+> int min(int a, int b) {
+>     if (a <= b){
+>         return a;
+>     }
+>     else {
+>         return b;
+>     }
+> }
+> 
+> float min(float a, float b) {
+>     if (a <= b){
+>         return a;
+>     }
+>     else {
+>         return b;
+>     }
+> }
+```
+
 The `test/` subirectory of this projects may give a basic insight
 on the code usage.
 
