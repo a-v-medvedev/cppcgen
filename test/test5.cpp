@@ -71,9 +71,6 @@ void find_arrangements(std::string str, std::vector<std::string> &result, int r)
 
 int main()
 {
-//    typedef expression_directory dir;
-//    typedef std::pair<const std::string, const std::string> macro;
-
     output out;
 
     auto sum = dir::add_class("Sum");
