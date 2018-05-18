@@ -90,6 +90,7 @@ $(TEST6_BIN): $(TEST6_OBJ)
 $(TEST7_BIN): $(TEST7_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(CPPCGEN_LIB_DIR) -l$(CPPCGEN_SHORT) -Wl,-rpath=.
 
+$(TEST7_OBJ): test/test7_stub.cpp
 
 clean:
 	rm -f $(TEST_OBJ) $(TEST_BIN)

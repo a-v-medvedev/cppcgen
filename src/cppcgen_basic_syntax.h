@@ -120,7 +120,9 @@ struct assignment_clause : public serial {
                                                               lval(_lval),
                                                               rval(_rval) {}
     virtual void print_self(output &out) const {
-        out << basic_expr(type) << " " << basic_expr(lval) << " = "
+        if (type.size())
+            out << basic_expr(type) << " "; 
+        out << basic_expr(lval) << " = "
             << basic_expr(rval) << ";\n";
     }
     CLONE(assignment_clause)
