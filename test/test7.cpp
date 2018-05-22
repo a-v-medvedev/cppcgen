@@ -161,14 +161,40 @@ struct LINEAR_CPU : public CPU_NDIM_loops, public LINEAR {
 struct NEWT2_CPU : public CPU_NDIM_loops, public NEWT2 {
 };
 
-std::shared_ptr<boundary_update_definitions> create_boundary_update_definitions(int order)
+/*
+struct COPY_CUDA : public CUDA_NDIM, public COPY {
+};
+
+struct LINEAR_CUDA : public CUDA_NDIM, public LINEAR {
+};
+
+struct NEWT2_CUDA : public CUDA_NDIM, public NEWT2 {
+};
+*/
+
+enum arch { CPU, CUDA };
+
+std::shared_ptr<boundary_update_definitions> create_boundary_update_definitions(arch a)
 {
-    switch (order) {
-        case 0: return std::make_shared<COPY_CPU>();
-        case 1: return std::make_shared<LINEAR_CPU>();
-        case 2: return std::make_shared<NEWT2_CPU>();
-        default: assert(false);
+    int order = macro_to_int("{NORDER}");
+    if (a == arch::CPU) {
+        switch (order) {
+            case 0: return std::make_shared<COPY_CPU>();
+            case 1: return std::make_shared<LINEAR_CPU>();
+            case 2: return std::make_shared<NEWT2_CPU>();
+            default: assert(false);
+        }
     }
+    else if (a == arch::CUDA) {
+        assert(false);
+        //switch (order) {
+            //case 0: return std::make_shared<COPY_CUDA>();
+            //case 1: return std::make_shared<LINEAR_CUDA>();
+            //case 2: return std::make_shared<NEWT2_CUDA>();
+            //default: assert(false);
+        //}
+    }
+    assert(false);
 }
 
 int main()
@@ -183,8 +209,8 @@ int main()
 
     // Loop over orders of approximation on boundary update (zero (copy), linear, 2nd order Newton's)
     for (int norder = 0; norder <= 2; norder++) {
-        auto defs = create_boundary_update_definitions(norder);
         macroses << int_to_macro("NORDER", norder);
+        auto defs = create_boundary_update_definitions(arch::CPU);
         // Get some basic macroses 
         macroses << defs->generate_basic_macroses();
         // Loop over amount of boundary cells
@@ -223,7 +249,7 @@ int main()
                     for (auto &f_or_r : front_or_rear) {
                         macroses << f_or_r;
 
-                        // Put is all together
+                        // Put it all together
                         function_body <<          
                             all_loops(
                                 assign_("size_t", "{const_direction}",  "{const_coord_value}") 
@@ -235,7 +261,7 @@ int main()
                 
                 // Render the whole i-dimensions function into output.
                 // We can't do this rendering later, since we change most macroses 
-                // when go to the next dimension
+                // when switch to the next dimension
                 out << update;
             }
         }

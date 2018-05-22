@@ -226,17 +226,106 @@ Output:
 The `test/` subirectory of this projects may give a basic insight
 of the library usage.
 
+## test7.cpp
 The most advanced test7.cpp implements a popular pattern of a boundary update for
-1D, 2D, 3D and 4D regular grids for single-cell and dual-cell boundaries. 
+1D, 2D, 3D and 4D regular grids.
 You can test if the generated code works well with a line similar to this one:
 ```
 ./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
 ```
 
+For 1D boundary update problem looks like this. Suppose we have an array of N
+numbers. We have to update the first and the last element of the array so that
+they are equal to their neighbours.
+```
+int a[N];
+
+{0} [1] [2] ... [N-2] {N-1} 
+
+{0}<-[1] [2] ... [N-2]->{N-1} 
+```
+This can be done with just 2 operations:
+```
+a[0] = a[1];
+a[N-1] = a[N-2];
+```
+The update function may look like this:
+```
+void update_1D(int *a, size_t N)
+{
+    a[0] = a[1];
+    a[N-1] = a[N-2];
+}
+```
+Then we may extend this definition for "two-cell boundary". Let's update two first and two last array elements:
+```
+int a[N];
+
+{0} [1] [2] ... [N-2] {N-1} 
+
+{0}<-{1}<-[2] ... [N-3]->[N-2]->{N-1} 
+```
+There appear 2 more operations:
+```
+a[0] = a[2];
+a[1] = a[2];
+a[N-1] = a[N-3];
+a[N-2] = a[N-3];
+```
+The separate update function may look like this:
+```
+void update_1D_2C(int *a, size_t N)
+{
+    a[0] = a[2];
+    a[1] = a[2];
+    a[N-1] = a[N-3];
+    a[N-2] = a[N-3];
+}
+```
+
+Now we extend the definition for 2D, 3D and 4D case and want to have different update methods: not only copy data from neighbours, but also implement some extrapolation as an option. This leads us to some bunch of update functions:
+
+```
+void update_boundary_1C_0O_1D(double *arr, size_t D1);
+void update_boundary_1C_0O_2D(double *arr, size_t D1, size_t D2);
+void update_boundary_1C_0O_3D(double *arr, size_t D1, size_t D2, size_t D3);
+void update_boundary_1C_0O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
+void update_boundary_2C_0O_1D(double *arr, size_t D1);
+void update_boundary_2C_0O_2D(double *arr, size_t D1, size_t D2);
+void update_boundary_2C_0O_3D(double *arr, size_t D1, size_t D2, size_t D3);
+void update_boundary_2C_0O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
+void update_boundary_1C_1O_1D(double *arr, size_t D1);
+void update_boundary_1C_1O_2D(double *arr, size_t D1, size_t D2);
+void update_boundary_1C_1O_3D(double *arr, size_t D1, size_t D2, size_t D3);
+void update_boundary_1C_1O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
+void update_boundary_2C_1O_1D(double *arr, size_t D1);
+void update_boundary_2C_1O_2D(double *arr, size_t D1, size_t D2);
+void update_boundary_2C_1O_3D(double *arr, size_t D1, size_t D2, size_t D3);
+void update_boundary_2C_1O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
+void update_boundary_1C_2O_1D(double *arr, size_t D1);
+void update_boundary_1C_2O_2D(double *arr, size_t D1, size_t D2);
+void update_boundary_1C_2O_3D(double *arr, size_t D1, size_t D2, size_t D3);
+void update_boundary_1C_2O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
+void update_boundary_2C_2O_1D(double *arr, size_t D1);
+void update_boundary_2C_2O_2D(double *arr, size_t D1, size_t D2);
+void update_boundary_2C_2O_3D(double *arr, size_t D1, size_t D2, size_t D3);
+void update_boundary_2C_2O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
+```
+where "1C" and "2C" distinguishes versions for single-cell and dual-cell boundaries; "1D", "2D", "3D" and "4D" declares the grid dimensions; "0O", "1O" and "2O" defines the order of extrapolation polynome used in the update function (0-order means just a direct copy of neighbour value as in the explanation above, 1st order means linear extrapolation with 2 neighbour points, 2nd order means the extrapolation with 2nd order Newton's polynome using 3 neighbour points).
+
+The test7.cpp makes an attempt of neat and structured generation of all these variations of update functions so that there is no runtime if's etc.
+
+Another requirement is generation the CUDA variation of all these functions. This task can be done rather easily, but the CUDA code generation is not implemented yet in this example, will be done in future.   
+
+With the line:
+```
+./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
+```
+you can run a visual test of 2D versions of these update functions.
 
 ## Build instructions
 
-GNU makefile was tested with `GNU make 4.0` and `GCC C++ compiler 4.7.4` only.
+GNU makefile was tested with `GNU make 4.0` and `GCC C++ compilers 4.7-6.0` only.
 There is probaby some dependency on `GNU bash`, `GNU fileutils` and `GNU findutils` 
 in some of Makefile commands.
 
