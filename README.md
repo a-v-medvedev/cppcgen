@@ -234,7 +234,7 @@ You can test if the generated code works well with a line similar to this one:
 ./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
 ```
 
-For 1D case, theboundary update problem looks like this. Suppose we have an array of N
+For 1D case, the boundary update problem looks like this. Suppose we have an array of N
 numbers. We have to update the first and the last element of the array so that
 they were equal to their neighbours.
 ```
