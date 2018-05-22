@@ -234,9 +234,9 @@ You can test if the generated code works well with a line similar to this one:
 ./test7 > test7_autogen.cpp && g++ test7_stub.cpp test7_autogen.cpp && ./a.out
 ```
 
-For 1D boundary update problem looks like this. Suppose we have an array of N
+For 1D case, theboundary update problem looks like this. Suppose we have an array of N
 numbers. We have to update the first and the last element of the array so that
-they are equal to their neighbours.
+they were equal to their neighbours.
 ```
 int a[N];
 
@@ -315,7 +315,7 @@ where "1C" and "2C" distinguishes versions for single-cell and dual-cell boundar
 
 The test7.cpp makes an attempt of neat and structured generation of all these variations of update functions so that there is no runtime if's etc.
 
-Another requirement is generation the CUDA variation of all these functions. This task can be done rather easily, but the CUDA code generation is not implemented yet in this example, will be done in future.   
+Another requirement is the generation of the CUDA version for all these functions. This task can be done rather easily, but the CUDA code generation is not implemented yet in this example, will be done in future.   
 
 With the line:
 ```
