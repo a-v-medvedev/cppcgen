@@ -15,14 +15,14 @@ generation of some C code portions which incorporate some repeated code
 structures or repeated similar complex expressions. 
 
 In simple cases it does what C++ templates do, but you can go much further with all the power
-of C++ data structures, inheritance and other ways to express complex ideas.
+of C++ data structures, polymorphism through inheritance and templates, lambdas and other ways to express complex ideas which are offered by modern C++.
 For example, one can rather easily make three versions of some subroutine: 1) simple CPU version, 2) OpenMP version, 3) CUDA version. 
-The main code of subroutine will be the same, but you can't do the generalisation of these 3 versions 
+The main code of subroutine is supposed to be the same, but you can't do the generalisation of these 3 versions 
 with C++ templates because OpenMP version requires adding pragmas, and CUDA version
 requires adding non-standard keywords and some changes in loops an index calculations.
 
 The **ccpcgen** was designed to generalise some compute-intensive
-subroutines in various versions which is a typical task for HPC. 
+subroutines to produce various versions of some complex maths code which is a typical task for HPC and compute-intensive programming. 
 But the abilities of the generator are not tied to any programming field and 
 may be also used in any kind of programming tasks. 
 
