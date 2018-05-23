@@ -30,7 +30,7 @@ struct if_clause : public branch {
     virtual void print_prolog(output &out) const {
         out << "if (";
         out << basic_expr(cond) << ")";
-        out << "{" << "\n";
+        out << " {" << "\n";
         out.level_up();
     }
     virtual void print_epilog(output &out) const {
@@ -94,19 +94,6 @@ struct return_clause : public branch {
     virtual void print_epilog(output &out) const { out << ";\n"; }
     CLONE(return_clause)
 };
-
-/*
-struct assignment_clause : public serial {
-    std::string lval, rval;
-    assignment_clause(std::string _lval, std::string _rval) : serial(),
-                                                              lval(_lval),
-                                                              rval(_rval) {}
-    virtual void print_self(output &out) const { 
-        out << basic_expr(lval) << " = " << basic_expr(rval) << ";\n";
-    }
-    CLONE(assignment_clause)
-};
-*/
 
 struct assignment_clause : public serial {
     std::string type, lval, rval;

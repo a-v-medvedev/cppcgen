@@ -16,9 +16,8 @@ structures or repeated similar complex expressions.
 
 In simple cases it does what C++ templates do, but you can go much further with all the power
 of C++ data structures, inheritance and other ways to express complex ideas.
-For example, one can rather easily make three versions of some subroutine:
-1) simple CPU version, 2) OpenMP version, 3) CUDA version. The main code
-of subroutine will be the same, but you can't do the generalisation of these 3 versions 
+For example, one can rather easily make three versions of some subroutine: 1) simple CPU version, 2) OpenMP version, 3) CUDA version. 
+The main code of subroutine will be the same, but you can't do the generalisation of these 3 versions 
 with C++ templates because OpenMP version requires adding pragmas, and CUDA version
 requires adding non-standard keywords and some changes in loops an index calculations.
 
@@ -42,6 +41,30 @@ comma-separated list of values to substitute each time.
 `SEQ` function generates at runtime a simple comma-separated sequence 
 of integer numbers.
 
+The C language syntax elements are represented by classes with overloaded `operator()` and
+`operator<<` methods, which allows natural nesting of the syntax elements. For example, this code:
+```
+function_("void", "f", "bool c, int &a, int &b")(
+    if_("c")(
+        "a = b;\n"
+    ) << else_()(
+        "b = a;\n"
+    )
+);
+
+```
+will produce as an output the following:
+```
+> void f(bool c, int &a, int &b) {
+>     if (c) {
+>         a = b;
+>     }
+>     else {
+>         b = a;
+>     }
+> }
+```
+ 
 ## Examples
 
 #### 1. Simple macro expansion:
