@@ -340,7 +340,7 @@ void update_boundary_2C_2O_2D(double *arr, size_t X, size_t Y) {
 ```
 
 The test7.cpp makes an attempt of neat and structured generation of all these variations of update functions so that there is no runtime if's etc and
-the generated code is as close to hand-written as possible when is compiled with any C optimizing C compiler.
+the generated code is as close to hand-written as possible when is compiled with any optimizing C compiler.
 
 Another requirement is the generation of the CUDA version for all these functions. This task can be done rather easily, but the CUDA code generation is not implemented yet in this example, will be done in future.   
 
