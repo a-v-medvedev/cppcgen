@@ -263,7 +263,7 @@ int a[N];
 
 {0} [1] [2] ... [N-2] {N-1} 
 
-{0}<-{1}<-[2] ... [N-3]->[N-2]->{N-1} 
+{0}<-{1}<-[2] ... [N-3]->{N-2}->{N-1} 
 ```
 There appear 2 more operations:
 ```
@@ -311,7 +311,7 @@ void update_boundary_2C_2O_2D(double *arr, size_t D1, size_t D2);
 void update_boundary_2C_2O_3D(double *arr, size_t D1, size_t D2, size_t D3);
 void update_boundary_2C_2O_4D(double *arr, size_t D1, size_t D2, size_t D3, size_t D4);
 ```
-where "1C" and "2C" distinguishes versions for single-cell and dual-cell boundaries; "1D", "2D", "3D" and "4D" declares the grid dimensions; "0O", "1O" and "2O" defines the order of extrapolation polynome used in the update function (0-order means just a direct copy of neighbour value as in the explanation above, 1st order means linear extrapolation with 2 neighbour points, 2nd order means the extrapolation with 2nd order Newton's polynome using 3 neighbour points).
+where "1C" and "2C" distinguishes versions for single-cell and dual-cell boundaries; "1D", "2D", "3D" and "4D" declares the grid dimensions; "0O", "1O" and "2O" defines the order of extrapolation polynomial used in the update function (0-order means just a direct copy of neighbour value as in the explanation above, 1st order means linear extrapolation with 2 neighbour points, 2nd order means the extrapolation with 2nd order Newton's polynomial using 3 neighbour points).
 
 As an example, a hand-written code for 2D case with 2nd order extrapolation and dual-cell boundary may look like this:
 ```
