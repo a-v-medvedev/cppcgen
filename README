@@ -1,6 +1,6 @@
 # cppcgen
 
-**cppcgen** is a generator of C code written in C++-11.
+**cppcgen** is a generator of C code written in C++11. It is a library which allows C++11 programs to create C-subroutines as an output.
 
 Copyright (c) 2011-2013,2018 Alexey V. Medvedev
 
@@ -13,6 +13,19 @@ See files COPYING and COPYING.LESSER for details.
 generation of C or simple C++ subroutines. It might be useful for automated 
 generation of some C code portions which incorporate some repeated code 
 structures or repeated similar complex expressions. 
+
+In simple cases it does what C++ templates do, but you can go much further with all the power
+of C++ data structures, inheritance and other ways to express complex ideas.
+For example, one can rather easily make three versions of some subroutine:
+1) simple CPU version, 2) OpenMP version, 3) CUDA version. The main code
+of subroutine will be the same, but you can't do the generalisation of these 3 versions 
+with C++ templates because OpenMP version requires adding pragmas, and CUDA version
+requires adding non-standard keywords and some changes in loops an index calculations.
+
+The **ccpcgen** was designed to generalise some compute-intensive
+subroutines in various versions which is a typical task for HPC. 
+But the abilities of the generator are not tied to any programming field and 
+may be also used in any kind of programming tasks. 
 
 The expressions definitions can use macroses, which are predefined at 
 runtime in Expressions Directory. Besides the strightforward macroses expansion, 
@@ -156,33 +169,33 @@ Output:
 #### 8. Extension of previous case for min/max and int/float variation in generated code:
 
 ```
-    auto common = dir::add_class("Common");
-    dir::set_as_default(common);
-    output out;
+auto common = dir::add_class("Common");
+dir::set_as_default(common);
+output out;
 
-    std::vector<std::vector<macro>> operators = {
-        { {"func_name", "max"}, {"bin_operation", ">="} },
-        { {"func_name", "min"}, {"bin_operation", "<="} }
-    };
+std::vector<std::vector<macro>> operators = {
+    { {"func_name", "max"}, {"bin_operation", ">="} },
+    { {"func_name", "min"}, {"bin_operation", "<="} }
+};
 
-    std::vector<macro> types = {
-        { "type", "int" },
-        { "type", "float" }
-    };
+std::vector<macro> types = {
+    { "type", "int" },
+    { "type", "float" }
+};
 
-    for (auto op : operators) {
-        common << op;
-        for (auto t : types) {
-            common << t;
-            out <<  function_("{type}", "{func_name}", "{type} a, {type} b")(
-                        if_("a {bin_operation} b")(
-                            return_("a")
-                        ) << else_()(
-                            return_("b")
-                        )
-            );
-        }
+for (auto op : operators) {
+    common << op;
+    for (auto t : types) {
+        common << t;
+        out <<  function_("{type}", "{func_name}", "{type} a, {type} b")(
+                    if_("a {bin_operation} b")(
+                        return_("a")
+                    ) << else_()(
+                        return_("b")
+                    )
+        );
     }
+}
 ```
 Output:
 ```
@@ -261,7 +274,7 @@ Then we may extend this definition for "two-cell boundary". Let's update two fir
 ```
 int a[N];
 
-{0} [1] [2] ... [N-2] {N-1} 
+{0} {1} [2] ... [N-3] {N-2} {N-1} 
 
 {0}<-{1}<-[2] ... [N-3]->{N-2}->{N-1} 
 ```
