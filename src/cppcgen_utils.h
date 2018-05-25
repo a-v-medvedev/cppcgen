@@ -10,6 +10,12 @@ typedef return_clause return_;
 typedef for_clause for_;
 typedef function_clause function_;
 typedef assignment_clause assign_;
+typedef switch_clause switch_;
+typedef case_clause case_;
+typedef break_clause break_;
+typedef continue_clause continue_;
+typedef default_clause default_;
+typedef call_clause call_;
 
 static inline std::vector<macro> format_macroses(const char *f, const char *t,
                                                  const std::vector<macro> &v)

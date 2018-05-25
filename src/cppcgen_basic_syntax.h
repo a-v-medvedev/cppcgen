@@ -86,13 +86,81 @@ struct for_clause : public branch {
     CLONE(for_clause)
 };
 
-struct return_clause : public branch {
+struct switch_clause : public branch {
+    std::string cond;
+    switch_clause(const std::string &_cond) : branch(), cond(_cond) { }
+    virtual void print_prolog(output &out) const {
+        out << "switch (";
+        out << basic_expr(cond) << ")";
+        out << " {" << "\n";
+        out.level_up();
+    }
+    virtual void print_epilog(output &out) const {
+        out.level_down();
+        out << "}" << "\n";
+    }
+    CLONE(switch_clause)
+};
+
+struct case_clause : public branch {
+    std::string cond;
+    case_clause(const std::string &_cond) : branch(), cond(_cond) { }
+    virtual void print_prolog(output &out) const {
+        out << "case ";
+        out << basic_expr(cond) << ":";
+        out << " {" << "\n";
+        out.level_up();
+    }
+    virtual void print_epilog(output &out) const {
+        out.level_down();
+        out << "}" << "\n";
+    }
+    CLONE(case_clause)
+};
+
+struct default_clause : public branch {
+    default_clause() : branch() { }
+    virtual void print_prolog(output &out) const {
+        out << "default: ";
+        out << " {" << "\n";
+        out.level_up();
+    }
+    virtual void print_epilog(output &out) const {
+        out.level_down();
+        out << "}" << "\n";
+    }
+    CLONE(default_clause)
+};
+
+struct return_clause : public serial {
     std::string expr;
-    return_clause() : branch() {}
-    return_clause(const std::string &_expr) : branch(), expr(_expr) {}
-    virtual void print_prolog(output &out) const { out << "return " << basic_expr(expr); }
-    virtual void print_epilog(output &out) const { out << ";\n"; }
+    return_clause() : serial() {}
+    return_clause(const std::string &_expr) : serial(), expr(_expr) {}
+    virtual void print_self(output &out) const { out << "return " << basic_expr(expr)
+                                                     << ";\n"; }
     CLONE(return_clause)
+};
+
+struct call_clause : public serial {
+    std::string name;
+    std::string expr;
+    call_clause() : serial() {}
+    call_clause(const std::string &_name, const std::string &_expr) : serial(), name(_name), expr(_expr) {}
+    virtual void print_self(output &out) const { out << basic_expr(name) << "(" 
+                                                     << basic_expr(expr) << ");\n"; }
+    CLONE(call_clause)
+};
+
+struct break_clause : public serial {
+    break_clause() : serial() {}
+    virtual void print_self(output &out) const { out << "break;\n"; }
+    CLONE(break_clause)
+};
+
+struct continue_clause : public serial {
+    continue_clause() : serial() {}
+    virtual void print_self(output &out) const { out << "continue;\n"; }
+    CLONE(continue_clause)
 };
 
 struct assignment_clause : public serial {
