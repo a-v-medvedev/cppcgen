@@ -16,6 +16,7 @@ typedef break_clause break_;
 typedef continue_clause continue_;
 typedef default_clause default_;
 typedef call_clause call_;
+typedef define_clause define_;
 
 static inline std::vector<macro> format_macroses(const char *f, const char *t,
                                                  const std::vector<macro> &v)

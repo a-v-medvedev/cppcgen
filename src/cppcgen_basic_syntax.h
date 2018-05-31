@@ -183,4 +183,14 @@ struct assignment_clause : public serial {
     CLONE(assignment_clause)
 };
 
+struct define_clause : public serial {
+    std::string name;
+    std::string expr;
+    define_clause() : serial() {}
+    define_clause(const std::string &_name, const std::string &_expr) : serial(), name(_name), expr(_expr) {}
+    virtual void print_self(output &out) const { out << "#define " << basic_expr(name) << " " 
+                                                     << basic_expr(expr) << "\n"; }
+    CLONE(define_clause)
+};
+
 }
