@@ -180,7 +180,7 @@ namespace cppcgen {
             i += delim.length();
             j = i;
         }
-        if (j < str.length() - 1)
+        if (j < str.length())
             result.push_back(str.substr(j, str.length() - j));
         if (result.size() == 1 && result[0].empty())
             result.erase(result.begin());
