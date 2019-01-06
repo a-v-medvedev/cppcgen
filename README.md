@@ -2,7 +2,7 @@
 
 **cppcgen** is a generator of C code written in C++11. It is a library which allows C++11 programs to create C-subroutines as an output.
 
-Copyright (c) 2011-2013,2018 Alexey V. Medvedev
+Copyright (c) 2011-2013,2018-2019 Alexey V. Medvedev
 
 ## License
 The project is licensed under GNU Lesser Public License version 3.0.
