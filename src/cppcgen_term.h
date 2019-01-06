@@ -57,7 +57,7 @@ struct just_string : public term {
     }
     explicit just_string(const output &_body) : term() { body = &_body; }
     virtual void print_self(output &out) const {
-        if (body) { out << body->get_str(); }
+        if (body) { out << basic_expr(body->get_str()).translate(); }
     }
     virtual void print(output &out) const final {
         print_self(out);

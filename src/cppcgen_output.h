@@ -29,11 +29,11 @@ class serial;
 class branch;
 
 class output {
-    friend output &cppcgen::operator<<(output &out, const term &t);
-    friend output &cppcgen::operator<<(output &out, const serial &t);
-    friend output &cppcgen::operator<<(output &out, const branch &t);
-    friend output &cppcgen::operator<<(output &out, const std::string &s);
-    friend output &cppcgen::operator<<(output &out, const std::ostream &os);
+    friend output &operator<<(output &out, const term &t);
+    friend output &operator<<(output &out, const serial &t);
+    friend output &operator<<(output &out, const branch &t);
+    friend output &operator<<(output &out, const std::string &s);
+    friend output &operator<<(output &out, const std::ostream &os);
     
     private:
     std::stringstream s;

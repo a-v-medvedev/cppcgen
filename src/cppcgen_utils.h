@@ -6,6 +6,7 @@ typedef expression_directory dir;
 typedef std::pair<const std::string, const std::string> macro;
 typedef if_clause if_;
 typedef else_clause else_;
+typedef else_if_clause else_if_;
 typedef return_clause return_;
 typedef for_clause for_;
 typedef function_clause function_;
@@ -24,6 +25,16 @@ static inline std::vector<macro> format_macroses(const char *f, const char *t,
     std::vector<macro> m;
     for (auto it = v.begin(); it != v.end(); it++) {
         m.push_back(macro { Format(f, it->first.c_str()), Format(t, it->second.c_str()) });
+    }
+    return m;
+}
+
+static inline std::vector<macro> format_macroses(const char *f, const char *t,
+                                                 const std::vector<std::pair<int, int>> &v)
+{
+    std::vector<macro> m;
+    for (auto it = v.begin(); it != v.end(); it++) {
+        m.push_back(macro { Format(f, it->first), Format(t, it->second) });
     }
     return m;
 }

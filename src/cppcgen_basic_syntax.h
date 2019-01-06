@@ -54,6 +54,22 @@ struct else_clause : public branch {
     CLONE(else_clause)
 };
 
+struct else_if_clause : public branch {
+    std::string cond;
+    else_if_clause(const std::string &_cond) : branch(), cond(_cond) { }
+    virtual void print_prolog(output &out) const {
+        out << "else if (";
+        out << basic_expr(cond) << ")";
+        out << " {" << "\n";
+        out.level_up();
+    }
+    virtual void print_epilog(output &out) const {
+        out.level_down();
+        out << "}" << "\n";
+    }
+    CLONE(else_if_clause)
+};
+
 struct block_clause : public branch {
     block_clause() : branch() { }
     virtual void print_prolog(output &out) const {
