@@ -107,7 +107,7 @@ void subst::act(std::string &str) {
             if (brackets[i].first == BR_NONE) {
                 if (opened && tk.len == 0) {
                     currlen++;
-                    if (str[i] == '.' || str[i] == '#' || 
+                    if (str[i] == '.' || str[i] == '\3' || 
                             str[i] == '\1' || str[i] == '\2') {
                         tk.len = currlen;
                     }
@@ -154,8 +154,8 @@ void subst::act(std::string &str) {
                 Delete(value, value.length() - 1, 1);
 //	  printf("Value = <%s>;%d, From = <%s>;%d\n", Value.c_str(), Value.length(), from.c_str(), from.length());
             if (value == from) {
-                str[t.start] = '#';
-                str[t.stop] = '#';
+                str[t.start] = '\3';
+                str[t.stop] = '\3';
                 Delete(str, t.start + 1, t.len);
                 Insert(str, to, t.start + 1);
             } else {
@@ -178,7 +178,7 @@ void subst::act(std::string &str) {
 
 
 void subst::remove_syntax_helpers(std::string &final_string) {
-    Replace(final_string, "#", "");
+    Replace(final_string, "\3", "");
 }
 
 std::string expr::render(std::vector<subst> &Substs) {
