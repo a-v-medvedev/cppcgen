@@ -24,7 +24,7 @@
 
 namespace cppcgen {
 
-class serial;
+struct serial;
 
 struct basic_expr {
     std::string str;
