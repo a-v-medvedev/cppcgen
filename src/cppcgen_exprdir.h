@@ -49,7 +49,7 @@ struct expression_class {
     friend expression_class &operator <<(expression_class &cl, std::vector<std::pair<const std::string, const std::string> > macroses);
 };
 
-class term;
+struct term;
 
 struct expression_directory {
     struct saver {

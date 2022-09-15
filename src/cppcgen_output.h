@@ -24,9 +24,9 @@
 
 namespace cppcgen {
 
-class term;
-class serial;
-class branch;
+struct term;
+struct serial;
+struct branch;
 
 class output {
     friend output &operator<<(output &out, const term &t);
